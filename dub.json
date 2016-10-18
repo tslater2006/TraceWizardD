@@ -3,7 +3,8 @@
 	"authors": [
 		"Tim Slater"
 	],
-	"targetPath": "bin",
+	"targetPath":"bin",
+	"targetType":"executable",
 	"dependencies": {
 		"dlangui": "~master"
 	},
@@ -11,7 +12,16 @@
 	"copyright": "Copyright 2016 - Tim Slater",
 	"license": "proprietary",
 
-	"subConfigurations" : {
-		"dlangui":"console"
-	}
+	"configurations": [
+		{
+			"name":"default"
+		},
+		{
+			"name":"console",
+			"subConfigurations": {
+				"dlangui":"console"
+			}
+		}
+
+	]
 } 
