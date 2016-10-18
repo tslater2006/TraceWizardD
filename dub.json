@@ -1,0 +1,16 @@
+{
+	"name": "tracewizard",
+	"authors": [
+		"Tim Slater"
+	],
+	"dependencies": {
+		"dlangui": "~master"
+	},
+	"description": "Trace Wizard in D",
+	"copyright": "Copyright 2016 - Tim Slater",
+	"license": "proprietary",
+
+	"subConfigurations" : {
+		"dlangui":"console"
+	}
+} 
