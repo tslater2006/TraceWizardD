@@ -11,13 +11,16 @@
 	"description": "Trace Wizard in D",
 	"copyright": "Copyright 2016 - Tim Slater",
 	"license": "proprietary",
-
 	"configurations": [
 		{
 			"name":"default"
 		},
 		{
+			"name":"unittest"
+		},
+		{
 			"name":"console",
+			"versions":["CONSOLE_BUILD"],
 			"subConfigurations": {
 				"dlangui":"console"
 			}

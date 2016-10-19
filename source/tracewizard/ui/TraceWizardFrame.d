@@ -1,12 +1,21 @@
 ﻿module tracewizard.ui.tracewizardframe;
 
 import dlangui;
+import dlangui.dialogs.dialog;
+import dlangui.dialogs.filedlg;
+
 import std.stdio;
 import std.conv;
+import core.thread;
 
 import tracewizard.ui.logpanel;
 import tracewizard.ui.execpath;
 import tracewizard.ui.sqlstatements;
+
+enum UIActions {
+	FILE_OPEN, FILE_EXIT
+}
+
 class TraceWizardFrame : AppFrame
 {
 
@@ -28,6 +37,7 @@ class TraceWizardFrame : AppFrame
 
 		layoutHeight = FILL_PARENT;
 		window.mainWidget = this;
+
 	}
 
 	override protected Widget createBody() {
@@ -60,14 +70,14 @@ class TraceWizardFrame : AppFrame
 		mainMenuItems = new MenuItem();
 		MenuItem fileItem = new MenuItem(new Action(1,"File"d));
 
-		MenuItem fileOpenItem = new MenuItem(new Action(2,"Open"d));
+		MenuItem fileOpenItem = new MenuItem(new Action(UIActions.FILE_OPEN,"Open"d));
 
-		MenuItem fileCompareItem = new MenuItem(new Action(3,"Compare Traces"d));
+		// MenuItem fileCompareItem = new MenuItem(new Action(3,"Compare Traces"d));
 
-		MenuItem fileExitItem = new MenuItem(new Action(4,"Exit"d));
+		MenuItem fileExitItem = new MenuItem(new Action(UIActions.FILE_EXIT,"Exit"d));
 
 		fileItem.add(fileOpenItem);
-		fileItem.add(fileCompareItem);
+		//fileItem.add(fileCompareItem);
 		fileItem.add(fileExitItem);
 
 		mainMenuItems.add(fileItem);
@@ -84,23 +94,62 @@ class TraceWizardFrame : AppFrame
 		_progressBar.layoutWidth = FILL_PARENT;
 		_progressBar.progress = 250;
 
-		//_progressBar.textColor = Color.black;
-		//_progressBar.backgroundColor = Color.white;
-
 		line.addChild(_progressBar);
 
-		//line.backgroundColor = Color.white;
 
 		return line;
 	}
 
 	override bool handleAction(const Action a) {
-		if (a.id == 4) {
-			window.close();
-			return true;
-		}
-		return false;
 
+		switch (a.id) {
+			case UIActions.FILE_EXIT:
+				window.close();
+				return true;
+			case UIActions.FILE_OPEN:
+				FileDialog dlg = new FileDialog(UIString("Open Trace File"), window, null);
+				dlg.addFilter(FileFilterEntry(UIString("Trace Files"d), "*.tracesql"));
+				dlg.dialogResult = delegate(Dialog d, const Action result) {
+					if (result.id == ACTION_OPEN.id) {
+						string filename = result.stringParam;
+						new LoadTraceThread(this,filename).start();
+					}
+				};
+				dlg.show();
+				return true;
+			default:
+				return false;
+		}
+
+	}
+
+	void onFinishLoad() {
+		window.showMessageBox("All Done!"d,"All Done!"d);
+
+		version(CONSOLE_BUILD) {
+			window.invalidate();
+		}
 	}
 }
 
+class LoadTraceThread : Thread {
+	TraceWizardFrame appFrame;
+	string traceFile;
+	this(TraceWizardFrame frame, string filePath) {
+		appFrame = frame;
+		traceFile = filePath;
+
+		super(&run);
+	}
+private:
+	void run() {
+		for (auto x = 0; x < 1000; x++) {
+			appFrame._progressBar.progress = x;
+			version(CONSOLE_BUILD) {
+				appFrame.window.invalidate();
+			}
+			Thread.sleep(dur!("msecs")(10));
+		}
+		appFrame.onFinishLoad();
+	}
+}
