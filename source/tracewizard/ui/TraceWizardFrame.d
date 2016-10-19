@@ -124,11 +124,13 @@ class TraceWizardFrame : AppFrame
 	}
 
 	void onFinishLoad() {
-		window.showMessageBox("All Done!"d,"All Done!"d);
+		executeInUiThread(() => updateUIAfterLoad());
+	}
 
-		version(CONSOLE_BUILD) {
-			window.invalidate();
-		}
+	void updateUIAfterLoad() {
+		Thread.sleep(dur!("msecs")(5000));
+		window.showMessageBox("Loaded"d,"This should be from UI Thread"d);
+
 	}
 }
 
